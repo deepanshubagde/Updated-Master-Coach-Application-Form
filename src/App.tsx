@@ -264,7 +264,7 @@ export default function App() {
       <Header />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8">
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 pt-3 sm:pt-4 pb-8 sm:pb-12">
         <form
           ref={formRef}
           onSubmit={handleSubmit}
