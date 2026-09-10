@@ -1,0 +1,6 @@
+{
+  "name": "Monkhood Master Coach Application",
+  "description": "Official application form for the Monkhood Master Coach Program with Mr. Deepanshu and team.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
