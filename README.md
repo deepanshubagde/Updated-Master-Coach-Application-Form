@@ -10,7 +10,7 @@ Official web application form for the **Monkhood Master Coach Program** with Mr.
 - **Direct Google Sheets Integration**: Real-time webhook submission to Google Sheets with serial number generation and timestamping.
 - **Optimized for Mobile & Desktop**: Clean luxury aesthetics with Cinzel display typography, warm metallic accents, and high-contrast accessibility.
 - **Offline & Redundancy Protection**: Submissions are backed up locally and sync to Google Sheets.
-- **Admin Configuration Modal**: Built-in coach portal (bottom-right lock icon) for webhook URL testing and setup instructions.
+- **Direct Checkout Redirection**: Successful applicants are seamlessly redirected to the official checkout page.
 
 ---
 

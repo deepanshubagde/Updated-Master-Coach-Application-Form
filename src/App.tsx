@@ -5,11 +5,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Header } from './components/Header';
-import { CoachInternalModal } from './components/CoachInternalModal';
 import { RatingInput } from './components/RatingInput';
 import { RadioGroup } from './components/RadioGroup';
 import { CoachingFormData, FormErrors } from './types';
-import { AlertCircle, ExternalLink, Lock } from 'lucide-react';
+import { AlertCircle, ExternalLink } from 'lucide-react';
 import {
   appendSubmissionToGoogleSheet,
   getStoredSheetInfo,
@@ -53,21 +52,8 @@ export default function App() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCoachModalOpen, setIsCoachModalOpen] = useState(false);
 
   const formRef = useRef<HTMLFormElement>(null);
-
-  // Check if admin/coach mode requested via URL parameter (?coach=true or ?admin=true)
-  useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('coach') === 'true' || params.get('admin') === 'true') {
-        setIsCoachModalOpen(true);
-      }
-    } catch {
-      // ignore
-    }
-  }, []);
 
   // Auto-save draft to local storage
   useEffect(() => {
@@ -275,7 +261,7 @@ export default function App() {
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-white text-neutral-900 flex flex-col selection:bg-amber-500 selection:text-white">
       {/* Header with small, short and sweet logo */}
-      <Header onOpenCoachModal={() => setIsCoachModalOpen(true)} />
+      <Header />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-8">
@@ -724,27 +710,11 @@ export default function App() {
           <p className="font-medium text-neutral-700">
             Monkhood &bull; Master Coach Certification Boot Camp
           </p>
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center">
             <span>&copy; Monkhood. All Rights Reserved. Private & Confidential.</span>
-            {/* Discreet coach management entry - subtle lock for Coach Deepanshu */}
-            <button
-              type="button"
-              onClick={() => setIsCoachModalOpen(true)}
-              title="Coach Portal"
-              className="text-neutral-400 hover:text-neutral-700 p-0.5 rounded transition cursor-pointer"
-              aria-label="Coach Portal"
-            >
-              <Lock className="w-3 h-3" />
-            </button>
           </div>
         </div>
       </footer>
-
-      {/* Internal Coach Management Portal (Only visible to Coach Deepanshu) */}
-      <CoachInternalModal
-        isOpen={isCoachModalOpen}
-        onClose={() => setIsCoachModalOpen(false)}
-      />
     </div>
   );
 }
