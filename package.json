@@ -2,7 +2,7 @@
   "name": "monkhood-master-coach-application",
   "description": "Official application form for the Monkhood Master Coach Program",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
