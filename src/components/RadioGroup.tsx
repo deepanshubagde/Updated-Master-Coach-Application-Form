@@ -47,6 +47,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
               key={option.value}
               htmlFor={optionId}
               id={`label-${optionId}`}
+              onClick={() => onChange(option.value)}
               className={`relative flex items-center justify-between p-3.5 sm:p-4 rounded-xl cursor-pointer border text-left transition-all duration-150 select-none ${
                 isSelected
                   ? 'bg-amber-50/70 border-amber-600 shadow-sm ring-1 ring-amber-500'

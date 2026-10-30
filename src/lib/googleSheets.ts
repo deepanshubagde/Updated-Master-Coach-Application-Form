@@ -99,9 +99,11 @@ export function saveToken(token: string, expiresInSeconds: number = 3600): void 
   }
 }
 
-export const DEFAULT_SPREADSHEET_ID = '1vEilcKSMLKNJ45iH9TuHGhIAlbWhkyZPrgUarGuBtCI';
+export const DEFAULT_SPREADSHEET_ID =
+  (import.meta.env.VITE_GOOGLE_SPREADSHEET_ID as string) ||
+  '1vEilcKSMLKNJ45iH9TuHGhlALbWhkyZPrgUarGuBtCI';
 export const DEFAULT_SPREADSHEET_NAME = 'Master Coach Application';
-export const DEFAULT_SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1vEilcKSMLKNJ45iH9TuHGhIAlbWhkyZPrgUarGuBtCI/edit';
+export const DEFAULT_SPREADSHEET_URL = `https://docs.google.com/spreadsheets/d/${DEFAULT_SPREADSHEET_ID}/edit`;
 
 /**
  * Get stored connected sheet info, defaulting to Deepanshu's Master Coach Application sheet.
@@ -110,7 +112,10 @@ export function getStoredSheetInfo(): ConnectedSheetInfo | null {
   try {
     const data = localStorage.getItem('monkhood_connected_sheet');
     if (data) {
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      if (parsed && parsed.id && parsed.id.includes('HGhlALb')) {
+        return parsed;
+      }
     }
   } catch {
     // ignore
@@ -134,20 +139,21 @@ export function saveSheetInfo(info: ConnectedSheetInfo): void {
 }
 
 export const DEFAULT_WEBHOOK_URL =
-  'https://script.google.com/macros/s/AKfycbwFR1ewl_Md90-bcHIZlKA6ZvQ7Nfe39mOmI8-jbHBe3rks581Zogq6aksfLugFLghA/exec';
+  (import.meta.env.VITE_SHEETS_WEBHOOK_URL as string) ||
+  'https://script.google.com/macros/s/AKfycbyFx_FBy2xQ4p8acMQMpEdO1VNw5o8sQz0u2yc7AVjlbPrcSzyNlOynESTIshQwELF-/exec';
 
 /**
  * Get stored Google Apps Script Webhook URL.
  */
 export function getStoredWebhookUrl(): string | null {
   try {
-    const fromStorage = localStorage.getItem('monkhood_webhook_url');
-    if (fromStorage && fromStorage.trim()) {
-      return fromStorage.trim();
-    }
     const fromEnv = (import.meta.env.VITE_SHEETS_WEBHOOK_URL as string) || '';
     if (fromEnv && fromEnv.trim()) {
       return fromEnv.trim();
+    }
+    const fromStorage = localStorage.getItem('monkhood_webhook_url');
+    if (fromStorage && fromStorage.trim() && !fromStorage.includes('AKfycbwFR1ewl_')) {
+      return fromStorage.trim();
     }
   } catch {
     // ignore
@@ -168,7 +174,7 @@ export function saveWebhookUrl(url: string): void {
 
 export const GOOGLE_APPS_SCRIPT_CODE = `// Run testAppend() once by clicking 'Run' (▶️) in Apps Script to authorize spreadsheet access
 function testAppend() {
-  var SPREADSHEET_ID = "1vEilcKSMLKNJ45iH9TuHGhIAlbWhkyZPrgUarGuBtCI";
+  var SPREADSHEET_ID = "1vEilcKSMLKNJ45iH9TuHGhlALbWhkyZPrgUarGuBtCI";
   var ss;
   try {
     ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -205,13 +211,13 @@ function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify({
     status: "active",
     message: "Monkhood Master Coach Google Sheets Webhook is Live & Connected!",
-    spreadsheetId: "1vEilcKSMLKNJ45iH9TuHGhIAlbWhkyZPrgUarGuBtCI"
+    spreadsheetId: "1vEilcKSMLKNJ45iH9TuHGhlALbWhkyZPrgUarGuBtCI"
   })).setMimeType(ContentService.MimeType.JSON);
 }
 
 function doPost(e) {
   try {
-    var SPREADSHEET_ID = "1vEilcKSMLKNJ45iH9TuHGhIAlbWhkyZPrgUarGuBtCI";
+    var SPREADSHEET_ID = "1vEilcKSMLKNJ45iH9TuHGhlALbWhkyZPrgUarGuBtCI";
     var ss;
     try {
       ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -528,8 +534,20 @@ export async function sendSubmissionViaWebhook(
     timestamp: new Date().toISOString(),
   };
 
+  const payloadString = JSON.stringify(payload);
+
+  // 1. Fire navigator.sendBeacon if supported by browser
   try {
-    // Mode 'no-cors' is required for Google Apps Script Web Apps to prevent cross-origin redirect errors
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      const blob = new Blob([payloadString], { type: 'text/plain;charset=utf-8' });
+      navigator.sendBeacon(webhookUrl, blob);
+    }
+  } catch {
+    // ignore
+  }
+
+  // 2. Fire fetch with keepalive: true (ensures delivery even across page unloads)
+  try {
     await fetch(webhookUrl, {
       method: 'POST',
       mode: 'no-cors',
@@ -537,7 +555,7 @@ export async function sendSubmissionViaWebhook(
       headers: {
         'Content-Type': 'text/plain;charset=utf-8',
       },
-      body: JSON.stringify(payload),
+      body: payloadString,
     });
     return true;
   } catch (err) {

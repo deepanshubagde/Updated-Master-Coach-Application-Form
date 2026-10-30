@@ -156,7 +156,7 @@ export default function App() {
   };
 
   const CHECKOUT_URL =
-    'https://monkhood.org/checkout/ec50ee45-abc2-4cca-8549-76e829a7ff8e';
+    'https://learn.monkhoodclub.com/web/lite/events/6ae47609596692a0bac56efc';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,10 +211,10 @@ export default function App() {
       }
 
       if (syncPromises.length > 0) {
-        // Wait up to 1.5 seconds for network dispatch before redirecting (keepalive ensures delivery)
+        // Wait up to 300ms for network socket dispatch before redirecting (keepalive and sendBeacon ensure delivery)
         await Promise.race([
           Promise.allSettled(syncPromises),
-          new Promise((resolve) => setTimeout(resolve, 1500)),
+          new Promise((resolve) => setTimeout(resolve, 300)),
         ]);
       }
     } catch (sheetErr) {
